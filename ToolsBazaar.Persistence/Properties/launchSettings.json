@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ToolsBazaar.Persistence": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "LC_ALL": "en_US.UTF-8"
+      }
+    }
+  }
+}

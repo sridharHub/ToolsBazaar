@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "ToolsBazaar.Web": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy",
+        "LC_ALL": "en_US.UTF-8"
+      },
+      "applicationUrl": "http://localhost:5127"
+    }
+  }
+}
