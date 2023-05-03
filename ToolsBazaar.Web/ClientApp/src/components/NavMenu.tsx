@@ -43,9 +43,7 @@ export function NavMenu() {
         <button onClick={toggleDarkMode}>
             {darkMode ? "Light Mode" : "Dark Mode"}
         </button>
-              <IconButton color="inherit" onClick={toggleDarkMode}>
-                  {darkMode ? "Light Mode" : "Dark Mode"}
-              </IconButton>
+
 
       </Toolbar>
     </AppBar>
