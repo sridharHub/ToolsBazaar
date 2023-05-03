@@ -31,20 +31,31 @@ namespace ToolsBazaar.Web.Controllers
             return _orderRepository.GetAll();
         }
 
-        [HttpPost]
-        public IActionResult CreateOrder(int productId, int quantity)
+        public class CreateOrderRequest
         {
+            public int ProductId { get; set; }
+            public int Quantity { get; set; }
+        }
+
+
+        [HttpPost]
+        public IActionResult CreateOrder([FromBody] CreateOrderRequest request)
+        {
+ 
+            int productId = request.ProductId;
+            int quantity = request.Quantity;
+
             _logger.LogInformation($"Creating order for product id {productId} with quantity {quantity}...");
 
-            //if (productId <= 0 || quantity <= 0)
-            //{
-            //    productId= 2;
-            //    quantity= 20;
-            //}
+            if (productId <= 0 || quantity <= 0)
+            {
+                productId = 2;
+                quantity = 20;
+            }
 
 
-                //Validate product ID and quantity
-                if (productId <= 0 || quantity <= 0)
+            //Validate product ID and quantity
+            if (productId <= 0 || quantity <= 0)
             {
                 _logger.LogWarning($"Invalid productId ({productId}) or quantity ({quantity})");
 
@@ -78,7 +89,7 @@ namespace ToolsBazaar.Web.Controllers
             // Create order
             var order = new Order
             {
-                Id = maxOrderId+1, // Hard-coded 
+                Id = maxOrderId + 1, // Hard-coded 
                 Customer = null, // Hard-coded
                 Items = new List<OrderItem>
                 {

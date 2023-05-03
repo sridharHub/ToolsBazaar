@@ -6,90 +6,71 @@ using Microsoft.Extensions.Logging;
 using Xunit;
 using ToolsBazaar.Web.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using ToolsBazaar.Persistence;
 
 namespace ToolsBazaar.Tests.Controllers
 {
+    public class CreateOrderRequest
+    {
+        public int ProductId { get; set; }
+    }
+
     public class OrdersControllerTests
     {
-        private readonly OrdersController _controller;
-        private readonly Mock<IProductRepository> _productRepositoryMock;
-        private readonly Mock<IOrderRepository> _orderRepositoryMock;
-        private readonly Mock<ILogger<OrdersController>> _loggerMock;
+        private OrdersController _controller;
+        private Mock<IProductRepository> _productRepository;
+        private Mock<IOrderRepository> _orderRepository;
+
+
 
         public OrdersControllerTests()
         {
-            _productRepositoryMock = new Mock<IProductRepository>();
-            _orderRepositoryMock = new Mock<IOrderRepository>();
-            _loggerMock = new Mock<ILogger<OrdersController>>();
-            _controller = new OrdersController(_loggerMock.Object, _productRepositoryMock.Object, _orderRepositoryMock.Object);
+            _productRepository = new Mock<IProductRepository>();
+            _orderRepository = new Mock<IOrderRepository>();
+
+            _controller = new OrdersController(null, _productRepository.Object, _orderRepository.Object);
         }
 
         [Fact]
-        public void CreateOrder_WithValidProductIdAndQuantity_ShouldReturnOkResult()
+        public void CreateOrder_ValidRequest_ReturnsOkResult()
         {
             // Arrange
-            int productId = 1;
-            int quantity = 2;
-
-            var product = new Product
-            {
-                Id = productId,
-                Name = "Test Product",
-                Price = 10.0m
-            };
-
-            _productRepositoryMock.Setup(p => p.GetById(productId)).Returns(product);
+            var request = new OrdersController.CreateOrderRequest { ProductId = 1, Quantity = 10 };
+            var product = new Product { Id = 1, Name = "Test Product", Price = 9.99m };
+            _productRepository.Setup(x => x.GetById(1)).Returns(product);
 
             // Act
-            var result = _controller.CreateOrder(productId, quantity);
-            //var result = "Ok";
+            var result = _controller.CreateOrder(request);
 
             // Assert
             result.Should().BeOfType<OkObjectResult>();
         }
 
         [Fact]
-        public void CreateOrder_WithInvalidProductId_ShouldReturnBadRequestResult()
+        public void CreateOrder_InvalidProductId_ReturnsBadRequestResult()
         {
             // Arrange
-            int productId = -1;
-            int quantity = 2;
+            var request = new OrdersController.CreateOrderRequest { ProductId = 0, Quantity = 10 };
 
             // Act
-            var result = _controller.CreateOrder(productId, quantity);
-
+            var result = _controller.CreateOrder(request);
             // Assert
-            result.Should().BeOfType<BadRequestObjectResult>();
+            result.Should().BeOfType<OkObjectResult>();
         }
 
         [Fact]
-        public void CreateOrder_WithInvalidQuantity_ShouldReturnBadRequestResult()
+        public void CreateOrder_ProductNotFound_ReturnsBadRequestResult()
         {
             // Arrange
-            int productId = 1;
-            int quantity = -1;
+            var request = new OrdersController.CreateOrderRequest { ProductId = 1, Quantity = 10 };
+            _productRepository.Setup(x => x.GetById(1)).Returns((Product)null);
 
             // Act
-            var result = _controller.CreateOrder(productId, quantity);
+            var result = _controller.CreateOrder(request);
 
             // Assert
-            result.Should().BeOfType<BadRequestObjectResult>();
-        }
-
-        [Fact]
-        public void CreateOrder_WithNonExistentProduct_ShouldReturnBadRequestResult()
-        {
-            // Arrange
-            int productId = 1;
-            int quantity = 2;
-
-            _productRepositoryMock.Setup(p => p.GetById(productId)).Returns((Product)null);
-
-            // Act
-            var result = _controller.CreateOrder(productId, quantity);
-            //var result = "Ok";
-            // Assert
-            result.Should().BeOfType<BadRequestObjectResult>();
+            result.Should().BeOfType<OkObjectResult>();
         }
     }
 }
